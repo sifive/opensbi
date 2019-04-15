@@ -68,6 +68,14 @@
 #define SSTATUS_UXL			0x0000000300000000
 #define SSTATUS64_SD			0x8000000000000000
 
+#define HSTATUS_VTSR			0x00400000
+#define HSTATUS_VTVM			0x00100000
+#define HSTATUS_SP2V			0x00000200
+#define HSTATUS_SP2P			0x00000100
+#define HSTATUS_SPV			0x00000080
+#define HSTATUS_STL			0x00000040
+#define HSTATUS_SPRV			0x00000001
+
 #define DCSR_XDEBUGVER			(3U<<30)
 #define DCSR_NDRESET			(1<<29)
 #define DCSR_FULLRESET			(1<<28)
@@ -262,6 +270,17 @@
 #define CSR_STVAL			0x143
 #define CSR_SIP				0x144
 #define CSR_SATP			0x180
+
+#define CSR_BSSTATUS			0x200
+#define CSR_BSIE			0x204
+#define CSR_BSTVEC			0x205
+#define CSR_BSSCRATCH			0x240
+#define CSR_BSEPC			0x241
+#define CSR_BSCAUSE			0x242
+#define CSR_BSTVAL			0x243
+#define CSR_BSIP			0x244
+#define CSR_BSATP			0x280
+
 #define CSR_MSTATUS			0x300
 #define CSR_MISA			0x301
 #define CSR_MEDELEG			0x302
@@ -302,6 +321,12 @@
 #define CSR_DCSR			0x7b0
 #define CSR_DPC				0x7b1
 #define CSR_DSCRATCH			0x7b2
+
+#define CSR_HSTATUS			0xa00
+#define CSR_HEDELEG			0xa02
+#define CSR_HIDELEG			0xa03
+#define CSR_HGATP			0xa80
+
 #define CSR_MCYCLE			0xb00
 #define CSR_MINSTRET			0xb02
 #define CSR_MHPMCOUNTER3		0xb03

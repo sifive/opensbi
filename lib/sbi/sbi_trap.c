@@ -79,12 +79,57 @@ static void __noreturn sbi_trap_error(const char *msg, int rc, u32 hartid,
 int sbi_trap_redirect(struct sbi_trap_regs *regs, struct sbi_scratch *scratch,
 		      ulong epc, ulong cause, ulong tval)
 {
-	ulong new_mstatus, prev_mode;
+	ulong hstatus, prev_mode;
 
 	/* Sanity check on previous mode */
 	prev_mode = (regs->mstatus & MSTATUS_MPP) >> MSTATUS_MPP_SHIFT;
 	if (prev_mode != PRV_S && prev_mode != PRV_U)
 		return SBI_ENOTSUPP;
+
+	/*
+	 * We always redirect trap to HS-mode if we came from
+	 * virtualized modes (VS/VU)
+	 */
+	if (misa_extension('H')) {
+#if __riscv_xlen == 32
+		if (regs->mstatusH & MSTATUSH_MPV) {
+#else
+		if (regs->mstatus & MSTATUS_MPV) {
+#endif
+			/* Update HSTATUS SP2P, SP2V, SPV, and STL bits */
+			hstatus = csr_read(CSR_HSTATUS);
+			hstatus &= ~HSTATUS_SP2P;
+			hstatus |= (regs->mstatus & MSTATUS_SPP) ?
+							HSTATUS_SP2P : 0;
+			hstatus &= ~HSTATUS_SP2V;
+			hstatus |= (hstatus & HSTATUS_SPV) ?
+							HSTATUS_SP2V : 0;
+			hstatus &= ~HSTATUS_SPV;
+#if __riscv_xlen == 32
+			hstatus |= (regs->mstatusH & MSTATUSH_MPV) ?
+#else
+			hstatus |= (regs->mstatus & MSTATUS_MPV) ?
+#endif
+							HSTATUS_SPV : 0;
+			hstatus &= ~HSTATUS_STL;
+#if __riscv_xlen == 32
+			hstatus |= (regs->mstatusH & MSTATUSH_MTL) ?
+#else
+			hstatus |= (regs->mstatus & MSTATUS_MTL) ?
+#endif
+							HSTATUS_STL : 0;
+			csr_write(CSR_HSTATUS, hstatus);
+
+			/* Clear MSTATUS MPV and MTL bits */
+#if __riscv_xlen == 32
+			regs->mstatusH &= ~MSTATUSH_MPV;
+			regs->mstatusH &= ~MSTATUSH_MTL;
+#else
+			regs->mstatus &= ~MSTATUS_MPV;
+			regs->mstatus &= ~MSTATUS_MTL;
+#endif
+		}
+	}
 
 	/* Update S-mode exception info */
 	csr_write(CSR_STVAL, tval);
@@ -94,26 +139,22 @@ int sbi_trap_redirect(struct sbi_trap_regs *regs, struct sbi_scratch *scratch,
 	/* Set MEPC to S-mode exception vector base */
 	regs->mepc = csr_read(CSR_STVEC);
 
-	/* Initial value of new MSTATUS */
-	new_mstatus = regs->mstatus;
-
-	/* Clear MPP, SPP, SPIE, and SIE */
-	new_mstatus &=
-		~(MSTATUS_MPP | MSTATUS_SPP | MSTATUS_SPIE | MSTATUS_SIE);
-
 	/* Set SPP */
+	regs->mstatus &= ~MSTATUS_SPP;
 	if (prev_mode == PRV_S)
-		new_mstatus |= (1UL << MSTATUS_SPP_SHIFT);
+		regs->mstatus |= (1UL << MSTATUS_SPP_SHIFT);
 
 	/* Set SPIE */
+	regs->mstatus &= ~MSTATUS_SPIE;
 	if (regs->mstatus & MSTATUS_SIE)
-		new_mstatus |= (1UL << MSTATUS_SPIE_SHIFT);
+		regs->mstatus |= (1UL << MSTATUS_SPIE_SHIFT);
+
+	/* Clear SIE */
+	regs->mstatus &= ~MSTATUS_SIE;
 
 	/* Set MPP */
-	new_mstatus |= (PRV_S << MSTATUS_MPP_SHIFT);
-
-	/* Set new value in MSTATUS */
-	regs->mstatus = new_mstatus;
+	regs->mstatus &= ~MSTATUS_MPP;
+	regs->mstatus |= (PRV_S << MSTATUS_MPP_SHIFT);
 
 	return 0;
 }
