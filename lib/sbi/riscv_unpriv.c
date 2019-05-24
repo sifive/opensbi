@@ -109,9 +109,10 @@ ulong get_insn(ulong mepc, ulong *mstatus)
 #else
 	    STR(LW) " %[insn], (%[addr])\n"
 #endif
-		     "csrw " STR(CSR_MSTATUS) ", %[mstatus]"
-	    : [mstatus] "+&r"(__mstatus), [insn] "=&r"(val)
-	    : [mprv] "r"(MSTATUS_MPRV | MSTATUS_MXR), [addr] "r"(__mepc));
+		"csrw "STR(CSR_MSTATUS)", %[mstatus]"
+		: [mstatus] "+&r" (__mstatus), [insn] "=&r" (val)
+		: [mprv] "r" (MSTATUS_MPRV | MSTATUS_MXR),
+		  [addr] "r" (__mepc));
 #else
 	ulong rvc_mask = 3, tmp;
 	asm("csrrs %[mstatus], " STR(CSR_MSTATUS) ", %[mprv]\n"
@@ -122,22 +123,78 @@ ulong get_insn(ulong mepc, ulong *mstatus)
 #else
 	    STR(LW) " %[insn], (%[addr])\n"
 #endif
-		     "and %[tmp], %[insn], %[rvc_mask]\n"
-		     "beq %[tmp], %[rvc_mask], 2f\n"
-		     "sll %[insn], %[insn], %[xlen_minus_16]\n"
-		     "srl %[insn], %[insn], %[xlen_minus_16]\n"
-		     "j 2f\n"
-		     "1:\n"
-		     "lhu %[insn], (%[addr])\n"
-		     "and %[tmp], %[insn], %[rvc_mask]\n"
-		     "bne %[tmp], %[rvc_mask], 2f\n"
-		     "lhu %[tmp], 2(%[addr])\n"
-		     "sll %[tmp], %[tmp], 16\n"
-		     "add %[insn], %[insn], %[tmp]\n"
-		     "2: csrw " STR(CSR_MSTATUS) ", %[mstatus]"
-	    : [mstatus] "+&r"(__mstatus), [insn] "=&r"(val), [tmp] "=&r"(tmp)
-	    : [mprv] "r"(MSTATUS_MPRV | MSTATUS_MXR), [addr] "r"(__mepc),
-	      [rvc_mask] "r"(rvc_mask), [xlen_minus_16] "i"(__riscv_xlen - 16));
+		"and %[tmp], %[insn], %[rvc_mask]\n"
+		"beq %[tmp], %[rvc_mask], 2f\n"
+		"sll %[insn], %[insn], %[xlen_minus_16]\n"
+		"srl %[insn], %[insn], %[xlen_minus_16]\n"
+		"j 2f\n"
+		"1:\n"
+		"lhu %[insn], (%[addr])\n"
+		"and %[tmp], %[insn], %[rvc_mask]\n"
+		"bne %[tmp], %[rvc_mask], 2f\n"
+		"lhu %[tmp], 2(%[addr])\n"
+		"sll %[tmp], %[tmp], 16\n"
+		"add %[insn], %[insn], %[tmp]\n"
+		"2: csrw "STR(CSR_MSTATUS)", %[mstatus]"
+	: [mstatus] "+&r" (__mstatus), [insn] "=&r" (val), [tmp] "=&r" (tmp)
+	: [mprv] "r" (MSTATUS_MPRV | MSTATUS_MXR), [addr] "r" (__mepc),
+	[rvc_mask] "r" (rvc_mask), [xlen_minus_16] "i" (__riscv_xlen - 16));
+#endif
+	if (mstatus)
+		*mstatus = __mstatus;
+	return val;
+}
+
+ulong get_insn_virt(ulong mepc, ulong *mstatus)
+{
+	register ulong __mepc asm ("a2") = mepc;
+	register ulong __mstatus asm ("a3");
+	register ulong __bsstatus asm ("a4");
+	ulong val;
+#ifndef __riscv_compressed
+	asm ("csrrs %[mstatus], "STR(CSR_MSTATUS)", %[mprv]\n"
+		"csrrs %[bsstatus], "STR(CSR_BSSTATUS)", %[smxr]\n"
+#if __riscv_xlen == 64
+		STR(LWU) " %[insn], (%[addr])\n"
+#else
+		STR(LW) " %[insn], (%[addr])\n"
+#endif
+		"csrw "STR(CSR_BSSTATUS)", %[bsstatus]"
+		"csrw "STR(CSR_MSTATUS)", %[mstatus]"
+		: [mstatus] "+&r" (__mstatus),
+		  [bsstatus] "+&r" (__bsstatus), [insn] "=&r" (val)
+		: [mprv] "r" (MSTATUS_MPRV | SSTATUS_MXR),
+		  [smxr] "r" (SSTATUS_MXR), [addr] "r" (__mepc));
+#else
+	ulong rvc_mask = 3, tmp;
+	asm ("csrrs %[mstatus], "STR(CSR_MSTATUS)", %[mprv]\n"
+		"csrrs %[bsstatus], "STR(CSR_BSSTATUS)", %[smxr]\n"
+		"and %[tmp], %[addr], 2\n"
+		"bnez %[tmp], 1f\n"
+#if __riscv_xlen == 64
+		STR(LWU) " %[insn], (%[addr])\n"
+#else
+		STR(LW) " %[insn], (%[addr])\n"
+#endif
+		"and %[tmp], %[insn], %[rvc_mask]\n"
+		"beq %[tmp], %[rvc_mask], 2f\n"
+		"sll %[insn], %[insn], %[xlen_minus_16]\n"
+		"srl %[insn], %[insn], %[xlen_minus_16]\n"
+		"j 2f\n"
+		"1:\n"
+		"lhu %[insn], (%[addr])\n"
+		"and %[tmp], %[insn], %[rvc_mask]\n"
+		"bne %[tmp], %[rvc_mask], 2f\n"
+		"lhu %[tmp], 2(%[addr])\n"
+		"sll %[tmp], %[tmp], 16\n"
+		"add %[insn], %[insn], %[tmp]\n"
+		"2: csrw "STR(CSR_BSSTATUS)", %[bsstatus]\n"
+		"csrw "STR(CSR_MSTATUS)", %[mstatus]"
+	: [mstatus] "+&r" (__mstatus), [bsstatus] "+&r" (__bsstatus),
+	  [insn] "=&r" (val), [tmp] "=&r" (tmp)
+	: [mprv] "r" (MSTATUS_MPRV | SSTATUS_MXR), [smxr] "r" (SSTATUS_MXR),
+	  [addr] "r" (__mepc), [rvc_mask] "r" (rvc_mask),
+	  [xlen_minus_16] "i" (__riscv_xlen - 16));
 #endif
 	if (mstatus)
 		*mstatus = __mstatus;

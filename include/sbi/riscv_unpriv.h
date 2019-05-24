@@ -44,5 +44,6 @@ DECLARE_UNPRIVILEGED_STORE_FUNCTION(u64)
 DECLARE_UNPRIVILEGED_LOAD_FUNCTION(ulong)
 
 ulong get_insn(ulong mepc, ulong *mstatus);
+ulong get_insn_virt(ulong mepc, ulong *mstatus);
 
 #endif
