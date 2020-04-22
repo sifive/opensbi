@@ -21,7 +21,7 @@
 
 /* clang-format off */
 
-#define VCU118_TLCLK				50000000
+#define VCU118_TLCLK				100000000
 
 #define VCU118_CLINT_ADDR			0x2000000
 

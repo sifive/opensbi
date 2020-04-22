@@ -12,7 +12,7 @@
 
 #define HAWKSBILL_NODE_NUM 		2
 #define HAWKSBILL_MAX_HART_PER_NODE	8
-#define HAWKSBILL_NODE2_BASE		0x200000000
+#define HAWKSBILL_NODE2_BASE		0x100000000
 
 #define hawksbill_get_node_idx() \
 	(sbi_current_hartid() / HAWKSBILL_MAX_HART_PER_NODE)
