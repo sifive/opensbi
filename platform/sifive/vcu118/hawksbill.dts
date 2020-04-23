@@ -320,7 +320,8 @@
 
 		clint@2000000 {
 			compatible = "riscv,clint0";
-			interrupts-extended = <&cpu1_intc 0x3 &cpu1_intc 0x7
+			interrupts-extended = <&cpu0_intc 0x3 &cpu0_intc 0x7
+                                               &cpu1_intc 0x3 &cpu1_intc 0x7
                                                &cpu2_intc 0x3 &cpu2_intc 0x7
                                                &cpu3_intc 0x3 &cpu3_intc 0x7
                                                &cpu4_intc 0x3 &cpu4_intc 0x7>;
@@ -330,10 +331,11 @@
 
 		clint@102000000 {
 			compatible = "riscv,clint0";
-			interrupts-extended = <&cpu1_intc 0x3 &cpu1_intc 0x7
-                                               &cpu2_intc 0x3 &cpu2_intc 0x7
-                                               &cpu3_intc 0x3 &cpu3_intc 0x7
-                                               &cpu4_intc 0x3 &cpu4_intc 0x7>;
+			interrupts-extended = <&cpu8_intc  0x3 &cpu8_intc  0x7
+                                               &cpu9_intc  0x3 &cpu9_intc  0x7
+                                               &cpu10_intc 0x3 &cpu10_intc 0x7
+                                               &cpu11_intc 0x3 &cpu11_intc 0x7
+                                               &cpu12_intc 0x3 &cpu12_intc 0x7>;
 			reg = <0x1 0x2000000 0x0 0x10000>;
 			reg-names = "control";
 		};
@@ -345,8 +347,21 @@
 			gpio-controller;
 			interrupt-controller;
 			interrupt-parent = <&plic0>;
-			interrupts = <0x12 0x13 0x14 0x15>;
+			interrupts = <6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21>;
 			reg = <0x0 0x10060000 0x0 0x1000>;
+			reg-names = "control";
+			numa-node-id = <1>;
+		};
+
+		gpio1: gpio@110060000 {
+			#gpio-cells = <0x2>;
+			#interrupt-cells = <0x2>;
+			compatible = "sifive,gpio0", "sifive,gpio1";
+			gpio-controller;
+			interrupt-controller;
+			interrupt-parent = <&plic1>;
+			interrupts = <6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21>;
+			reg = <0x1 0x10060000 0x0 0x1000>;
 			reg-names = "control";
 			numa-node-id = <1>;
 		};
@@ -355,7 +370,7 @@
 			#interrupt-cells = <0x1>;
 			compatible = "sifive,plic-1.0.0";
 			reg = <0x0 0xc000000 0x0 0x4000000>;
-			riscv,ndev = <0x15>;
+			riscv,ndev = <45>;
 			interrupt-controller;
 			interrupts-extended = <&cpu0_intc 0xffffffff
                                                &cpu1_intc 0xffffffff &cpu1_intc 0x9
@@ -371,7 +386,7 @@
 			#interrupt-cells = <0x1>;
 			compatible = "sifive,plic-1.0.0";
 			reg = <0x1 0xc000000 0x0 0x4000000>;
-			riscv,ndev = <0x15>;
+			riscv,ndev = <45>;
 			interrupt-controller;
 			interrupts-extended = <&cpu8_intc 0xffffffff
                                                &cpu9_intc 0xffffffff &cpu9_intc 0x9
@@ -397,7 +412,7 @@
 			interrupt-map-mask = <0x0 0x0 0x0 0x7>;
 			interrupt-names = "misc", "msi0", "msi1";
 			interrupt-parent = <&plic0>;
-			interrupts = <0xf 0x10 0x11>;
+			interrupts = <43 44 45>;
 			ranges = <0x2000000 0x0 0x40000000 0x0 0x40000000 0x0 0x40000000>;
 			reg = <0x0 0x20000000 0x0 0x4000000>;
 			reg-names = "control";
@@ -423,8 +438,8 @@
                                          &pci_intc1 0x4>;
 			interrupt-map-mask = <0x0 0x0 0x0 0x7>;
 			interrupt-names = "misc", "msi0", "msi1";
-			interrupt-parent = <&gpio0>;
-			interrupts = <0x0 0x4 0x1 0x4 0x2 0x4>;
+			interrupt-parent = <&plic1>;
+			interrupts = <43 44 45>;
 			ranges = <0x2000000 0x1 0x40000000 0x1 0x40000000 0x0 0x40000000>;
 			reg = <0x1 0x20000000 0x0 0x4000000>;
 			reg-names = "control";
@@ -443,7 +458,7 @@
 			interrupt-parent = <&plic0>;
 			clocks = <&tlclk0>;
 			status = "okay";
-			interrupts = <0xd>;
+			interrupts = <5>;
 			numa-node-id = <0>;
 		};
 
@@ -453,7 +468,7 @@
 			interrupt-parent = <&plic1>;
 			clocks = <&tlclk0>;
 			status = "okay";
-			interrupts = <0xd>;
+			interrupts = <5>;
 			numa-node-id = <1>;
 		};
 
@@ -461,7 +476,7 @@
 			compatible = "sifive,fu540-c000-spi", "sifive,spi0";
 			reg = <0x0 0x10050000 0x0 0x1000>;
 			interrupt-parent = <&plic0>;
-			interrupts = <0xe>;
+			interrupts = <26>;
 			clocks = <&tlclk0>;
 			#address-cells = <0x1>;
 			#size-cells = <0x0>;
@@ -480,7 +495,7 @@
 			compatible = "sifive,fu540-c000-spi", "sifive,spi0";
 			reg = <0x1 0x10050000 0x0 0x1000>;
 			interrupt-parent = <&plic1>;
-			interrupts = <0xe>;
+			interrupts = <26>;
 			clocks = <&tlclk0>;
 			#address-cells = <0x1>;
 			#size-cells = <0x0>;
