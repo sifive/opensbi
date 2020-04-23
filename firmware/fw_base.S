@@ -316,6 +316,10 @@ _fdt_reloc_again:
 	add	t1, t1, __SIZEOF_POINTER__
 	blt	t1, t2, _fdt_reloc_again
 _fdt_reloc_done:
+	/* combine chips to get a legal hartid */
+	la	sp, _fw_end
+	addi	sp, sp, 1024
+	call	omnixtend
 
 	/* mark boot hart done */
 	li	t0, BOOT_STATUS_BOOT_HART_DONE
