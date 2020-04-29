@@ -14,8 +14,7 @@
 
 void vcu118_plic_fdt_fixup(void *fdt, const char *compat);
 
-int vcu118_plic_warm_irqchip_init(u32 target_hart, int m_cntx_id,
-				  int s_cntx_id);
+int vcu118_plic_warm_irqchip_init(u32 target_hart);
 
 int vcu118_plic_cold_irqchip_init(unsigned long base, u32 num_sources,
 				  u32 hart_count);

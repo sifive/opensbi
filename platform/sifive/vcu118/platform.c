@@ -18,6 +18,7 @@
 #include <sbi_utils/serial/sifive-uart.h>
 #include "plic.h"
 #include "clint.h"
+#include "platform.h"
 
 /* clang-format off */
 
@@ -26,7 +27,7 @@
 #define VCU118_CLINT_ADDR			0x2000000
 
 #define VCU118_PLIC_ADDR			0xc000000
-#define VCU118_PLIC_NUM_SOURCES			0x15
+#define VCU118_PLIC_NUM_SOURCES			45
 #define VCU118_PLIC_NUM_PRIORITIES		7
 
 #define VCU118_UART0_ADDR			0x10010000
@@ -36,11 +37,8 @@
  * Hawksbill project consist ofs two VCU118 boards.
  * Each VCU118 has 5 HARTs but HART ID 0 doesn't have S mode.
  */
-#define VCU118_ENABLED_HART_MASK		\
-	(1 << 1 | 1 << 2 | 1 << 3 | 1 << 4 | 	\
-	 1 << 9 | 1 << 10 | 1 << 11 | 1 << 12)
-#define VCU118_HARITD_DISABLED			~(VCU118_ENABLED_HART_MASK)
-#define VCU118_HART_COUNT			32
+#define VCU118_HARITD_DISABLED			(1 << 0 | 1 << 8 | 1 << 16 | 1 << 24)
+#define VCU118_HART_COUNT			(HAWKSBILL_MAX_NODE_NUM * HAWKSBILL_MAX_HART_PER_NODE)
 #define VCU118_HART_STACK_SIZE			8192
 
 /* clang-format on */
@@ -135,9 +133,7 @@ static int vcu118_irqchip_init(bool cold_boot)
 			return rc;
 	}
 
-	return vcu118_plic_warm_irqchip_init(hartid,
-					     (hartid) ? (2 * hartid - 1) : 0,
-					     (hartid) ? (2 * hartid) : -1);
+	return vcu118_plic_warm_irqchip_init(hartid);
 }
 
 static int vcu118_ipi_init(bool cold_boot)
@@ -272,29 +268,51 @@ static void printc2(char ch, uintptr_t x) {
     } while (r < 0);
 }
 
-static void __attribute__ ((noinline)) flush(uintptr_t flush64) {
-	for (uint64_t x = 0x2000000000UL; x < 0x2010000000UL; x += 64)
-		SQ(flush64, x);
-	asm volatile ("fence");
-}
-
 // !!! This next bit is extremely unsafe. We are about to relocate DDR ... where we are running!
 // Fortunately, for our initial devwork, the chips have identical memory layout
 // ... we would ideally execute the next bit (flush, move, flush, enable) from a local SRAM/ROM
 // It is vital that this function fit inside a single cache line so we don't get stuck.
-static void __attribute__ ((noinline,aligned(64))) flip_memory(uintptr_t flush64, uintptr_t prefix, uintptr_t val, uintptr_t enable) {
-	// Flush L2 cache (write-back all dirty data)
-	// From here until the next flush, no stores to memory are allowed
-	flush(flush64); // this preloads flush into I$
-	// This switches main memory, essentially rendering everything invalid
-	SQ(prefix, val);
-	asm volatile ("fence");
-	// Flush L2 cache (invalidate anything cached since last flush)
-	flush(flush64); // this is still cached
-	// Caches are now consistent with new memory map and routes are established; allow TLoE traffic
-	// This transition (invalid => valid) does not need a barrier. TL forbids caching invalid.
-	SW(enable, 1);
-	asm volatile ("fence.i");
+static void __attribute__ ((noinline)) flip_memory(uintptr_t flush64, uintptr_t prefix, uintptr_t val, uintptr_t first_enable, uintptr_t last_enable) {
+#define STR1(s) #s
+#define STR2(s) STR1(s)
+	__asm__ __volatile__ (
+		// Make sure the code from here fits into one I$ block
+		".align 6\n\t"
+		// Flush L2 cache (write-back all dirty data)
+		// From here until the next flush, no stores to memory are allowed
+		"call	_flush\n\t"
+		// This switches main memory, essentially rendering everything invalid
+		"sd	%2, (%1)\n\t"			// *prefix = val
+		"fence\n\t"
+		// Flush L2 cache (invalidate anything cached since last flush)
+		"call	_flush\n\t"
+
+		// Caches are now consistent with new memory map and routes are established; allow TLoE traffic
+		// This transition (invalid => valid) does not need a barrier. TL forbids caching invalid.
+		// Turn on all the other mbusses (zero(1) is already enabled)
+		"li	t1, " STR2(TL_VCX) "\n\t"
+		"li	t0, 1\n\t"
+		"1:\n\t"
+		"sw	t0, (%3)\n\t"			// *enable = 1
+		"add	%3, %3, t1\n\t"			// enable += TL_VCX
+		"bne	%3, %4, 1b\n\t"
+
+		"fence.i\n\t"
+		"j 	2f\n\t"
+
+		"_flush:\n\t"
+		"li	t0, 0x2000000000\n\t"
+		"li	t1, 0x2080000000\n\t"
+		"1:\n\t"
+		"sd	t0, (%0)\n\t"			// *flush64 = address
+		"addi	t0, t0, 64\n\t"
+		"bne	t0, t1, 1b\n\t"
+
+		"fence\n\t"
+		"ret\n\t"
+
+		"2:\n\t"
+	: : "r"(flush64), "r"(prefix), "r"(val), "r"(first_enable), "r"(last_enable) : "t0", "t1", "ra");
 }
 
 static int his_id(int chan, int my_id) {
@@ -305,9 +323,15 @@ static int his_id(int chan, int my_id) {
 	}
 }
 
+static int node_num;
+int hawksbill_node_num(void)
+{
+	return node_num;
+}
+
 void omnixtend(void)
 {
-	const uint8_t mac[6] = { 0x68, 0x05, 0xCA, 0x88, 0x00 /* chip */, 0x00 /* vc */ };
+	const uint8_t mac[6] = { 0x68, 0x05, 0xCA, 0x88, 0x63, 0x00 /* chip */ };
 	const uint8_t eth[2] = { 0xAA, 0xAA };
 
 	// Use DIP switch=0 to determine chip ID
@@ -316,9 +340,7 @@ void omnixtend(void)
 	int     nchan = (dip >> 2) & 3;
 	printc('0' + id);
 	printc('0' + nchan);
-
-	// Number of channels in hardware
-	int maxchan = 3;
+	node_num = nchan+1;
 
 	/************************ Configure TLoE ethernet RX/TX **************************/
 
@@ -334,25 +356,25 @@ void omnixtend(void)
 		int instance;
 
 		// TX framing
-		header[4]  = hid; // dest   MAC
-		header[10] = id;  // sender MAC
+		header[5]  = hid; // dest   MAC
+		header[11] = id;  // sender MAC
 
 		for (int vc = 0; vc < 2; ++vc) { // VC0=cbus VC1=mbus
-			header[5] = header[11] = vc;
-			instance = chan + (maxchan * vc);
+			instance = chan + ((HAWKSBILL_MAX_NODE_NUM-1) * vc);
 			set_header(PP_TX_BASE + (PP_VCX*instance) + PP_TX_HEADER_DATA, header);
 			SQ(PP_TX_BASE + (PP_VCX*instance) + PP_TX_HEADER_INSERT, ETHERNET_HEADER);
 		}
 
 		// Setup RX packet deframing/demux
-		header[4]  = id;  // dest   MAC
-		header[10] = hid; // sender MAC
+		header[5]  = id;  // dest   MAC
+		header[11] = hid; // sender MAC
 		for (int vc = 0; vc < 2; ++vc) {
-			header[5] = header[11] = vc;
-			instance = chan + (maxchan * vc);
+			instance = chan + ((HAWKSBILL_MAX_NODE_NUM-1) * vc);
 			set_header(PP_RX_BASE + (PP_VCX*instance) + PP_RX_HEADER_DATA, header);
-			SQ(PP_RX_BASE + (PP_VCX*instance) + PP_RX_HEADER_MASK, (1 << ETHERNET_HEADER) - 1);
 			SQ(PP_RX_BASE + (PP_VCX*instance) + PP_RX_HEADER_STRIP, ETHERNET_HEADER);
+			// Match on sender+dest MAC and also the VC field in the TLoE header
+			SB(PP_RX_BASE + (PP_VCX*instance) + PP_RX_HEADER_DATA + ETHERNET_HEADER, vc << 5);
+			SQ(PP_RX_BASE + (PP_VCX*instance) + PP_RX_HEADER_MASK, (1 << (ETHERNET_HEADER+1)) - 1);
 		}
 
 		// Mark packets with VC in TLoE header
@@ -381,7 +403,7 @@ void omnixtend(void)
 
 	// Set our hartid base to 8*id (ie: if we were hartid=0, we are now 8).
 	printc('h');
-	SQ(AC_BASE+AC_HART_PREFIX, id * 8);
+	SQ(AC_BASE+AC_HART_PREFIX, id * HAWKSBILL_MAX_HART_PER_NODE);
 
 	// This moves the MMIO space; after this line, local devices are re-positioned with offset c
 	printc('c');
@@ -393,16 +415,16 @@ void omnixtend(void)
 	for (int chan = 0; chan < nchan; ++chan)
 		SW(c+TL_C_BASE+(TL_VCX*(1+chan))+TL_VC_ENABLE, 1);
 
-	printc2('.', c);
 	printc('0' + id); // indicate access to board 0
 
 	// Move local memory; effectively like a DDR-wide DMA transfer
 	printc2('m', c);
-	flip_memory(c+L2_BASE+L2_FLUSH64, c+AC_BASE+AC_M_PREFIX, m, c+TL_M_BASE+TL_VCX+TL_VC_ENABLE);
-
-	// Turn on all the other mbusses (zero(1) is already enabled)
-	for (int chan = 1; chan < nchan; ++chan)
-		SW(c+TL_M_BASE+(TL_VCX*(1+chan))+TL_VC_ENABLE, 1);
-
-	printc2('.', c);
+	if (nchan > 0) {
+		flip_memory(
+			c+L2_BASE+L2_FLUSH64,
+			c+AC_BASE+AC_M_PREFIX,
+			m,
+			c+TL_M_BASE+(1      )*TL_VCX+TL_VC_ENABLE,
+			c+TL_M_BASE+(1+nchan)*TL_VCX+TL_VC_ENABLE);
+	}
 }

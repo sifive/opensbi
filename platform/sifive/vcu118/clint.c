@@ -16,8 +16,8 @@
 #include "clint.h"
 
 static u32 clint_ipi_hart_count;
-static volatile void *clint_ipi_base[HAWKSBILL_NODE_NUM];
-static volatile u32 *clint_ipi[HAWKSBILL_NODE_NUM];
+static volatile void *clint_ipi_base[HAWKSBILL_MAX_NODE_NUM];
+static volatile u32 *clint_ipi[HAWKSBILL_MAX_NODE_NUM];
 
 void vcu118_clint_ipi_send(u32 target_hart)
 {
@@ -60,18 +60,18 @@ int vcu118_clint_cold_ipi_init(unsigned long base, u32 hart_count)
 {
 	/* Figure-out CLINT IPI register address */
 	clint_ipi_hart_count = hart_count;
-	clint_ipi_base[0]    = (void *)base;
-	clint_ipi[0]	 = (u32 *)clint_ipi_base[0];
-	clint_ipi_base[1]    = (void *)(base + HAWKSBILL_NODE2_BASE);
-	clint_ipi[1]	 = (u32 *)clint_ipi_base[1];
+	for (int i = 0; i < HAWKSBILL_MAX_NODE_NUM; ++i) {
+		clint_ipi_base[i] = (void *)base + (i*HAWKSBILL_NODE_OFFSET_FACTOR);
+		clint_ipi[i] = (u32 *)clint_ipi_base[i];
+	}
 
 	return 0;
 }
 
 static u32 clint_time_hart_count;
-static volatile void *clint_time_base[HAWKSBILL_NODE_NUM];
-static volatile u64 *clint_time_val[HAWKSBILL_NODE_NUM];
-static volatile u64 *clint_time_cmp[HAWKSBILL_NODE_NUM];
+static volatile void *clint_time_base[HAWKSBILL_MAX_NODE_NUM];
+static volatile u64 *clint_time_val[HAWKSBILL_MAX_NODE_NUM];
+static volatile u64 *clint_time_cmp[HAWKSBILL_MAX_NODE_NUM];
 
 static inline u32 vcu118_clint_time_read_hi(u32 idx)
 {
@@ -102,7 +102,7 @@ u64 vcu118_clint_timer_value(void)
 void vcu118_clint_timer_event_stop(void)
 {
 	u32 target_hart = sbi_current_hartid();
-	u32 node_idx   = hawksbill_get_node_idx_by_target(sbi_current_hartid());
+	u32 node_idx   = hawksbill_get_node_idx_by_target(target_hart);
 	u32 target_idx = hawksbill_get_node_target_idx(target_hart);
 
 	if (clint_time_hart_count <= target_idx)
@@ -121,7 +121,7 @@ void vcu118_clint_timer_event_stop(void)
 void vcu118_clint_timer_event_start(u64 next_event)
 {
 	u32 target_hart = sbi_current_hartid();
-	u32 node_idx   = hawksbill_get_node_idx_by_target(sbi_current_hartid());
+	u32 node_idx   = hawksbill_get_node_idx_by_target(target_hart);
 	u32 target_idx = hawksbill_get_node_target_idx(target_hart);
 	u64 mtime_master, mtime_own, mtime_diff;
 
@@ -165,7 +165,7 @@ void vcu118_clint_timer_event_start(u64 next_event)
 int vcu118_clint_warm_timer_init(void)
 {
 	u32 target_hart = sbi_current_hartid();
-	u32 node_idx   = hawksbill_get_node_idx_by_target(sbi_current_hartid());
+	u32 node_idx   = hawksbill_get_node_idx_by_target(target_hart);
 	u32 target_idx = hawksbill_get_node_target_idx(target_hart);
 
 	if (clint_time_hart_count <= target_idx || !clint_time_base[node_idx])
@@ -187,12 +187,11 @@ int vcu118_clint_cold_timer_init(unsigned long base, u32 hart_count)
 {
 	/* Figure-out CLINT Time register address */
 	clint_time_hart_count = hart_count;
-	clint_time_base[0]    = (void *)base;
-	clint_time_val[0]     = (u64 *)(clint_time_base[0] + 0xbff8);
-	clint_time_cmp[0]     = (u64 *)(clint_time_base[0] + 0x4000);
-	clint_time_base[1]    = (void *)(base + HAWKSBILL_NODE2_BASE);
-	clint_time_val[1]     = (u64 *)(clint_time_base[1] + 0xbff8);
-	clint_time_cmp[1]     = (u64 *)(clint_time_base[1] + 0x4000);
+	for (int i = 0; i < HAWKSBILL_MAX_NODE_NUM; ++i) {
+		clint_time_base[i]    = (void *)base + (i*HAWKSBILL_NODE_OFFSET_FACTOR);;
+		clint_time_val[i]     = (u64 *)(clint_time_base[i] + 0xbff8);
+		clint_time_cmp[i]     = (u64 *)(clint_time_base[i] + 0x4000);
+	}
 
 	return 0;
 }
