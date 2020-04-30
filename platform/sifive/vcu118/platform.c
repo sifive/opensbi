@@ -46,7 +46,7 @@
 static void vcu118_modify_dt(void *fdt)
 {
 	u32 i, size;
-	int chosen_offset, err;
+	int chosen_offset, err, numa_offset;
 	int cpu_offset;
 	char cpu_node[32] = "";
 	const char *mmu_type;
@@ -75,6 +75,22 @@ static void vcu118_modify_dt(void *fdt)
 			   "/soc/serial@10010000:115200");
 
 	vcu118_plic_fdt_fixup(fdt, "sifive,plic-1.0.0");
+
+	// Eliminate all devices/cpus/memory with a distance > hawksbill_node_num
+	for (numa_offset = fdt_next_node(fdt, -1, NULL);
+	     numa_offset >= 0;
+	     numa_offset = fdt_next_node(fdt, numa_offset, NULL))
+	{
+		int len;
+		const u32 *val;
+
+		val = fdt_getprop(fdt, numa_offset, "numa-node-id", &len);
+
+		if (val && len == 4 && fdt32_to_cpu(*val) >= hawksbill_node_num()) {
+			fdt_del_node(fdt, numa_offset);
+			numa_offset = -1;
+		}
+	}
 }
 
 static int vcu118_final_init(bool cold_boot)
