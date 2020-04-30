@@ -52,26 +52,26 @@ static void vcu118_plic_set_ie(u32 cntxid, u32 word_index, u32 val, u32 idx)
 
 void vcu118_plic_fdt_fixup(void *fdt, const char *compat)
 {
-	u32 *cells;
-	int i, cells_count;
-	int plic_off;
+	for (int plic_off = fdt_node_offset_by_compatible(fdt, -1, compat);
+	     plic_off != -FDT_ERR_NOTFOUND;
+	     plic_off = fdt_node_offset_by_compatible(fdt, plic_off, compat))
+	{
+		u32 *cells;
+		int cells_count;
 
-	plic_off = fdt_node_offset_by_compatible(fdt, 0, compat);
-	if (plic_off < 0)
-		return;
+		cells = (u32 *)fdt_getprop(
+			fdt, plic_off, "interrupts-extended",  &cells_count);
+		if (!cells)
+			continue;
 
-	cells = (u32 *)fdt_getprop(fdt, plic_off, "interrupts-extended",
-				   &cells_count);
-	if (!cells)
-		return;
+		cells_count = cells_count / sizeof(u32);
+		if (!cells_count)
+			continue;
 
-	cells_count = cells_count / sizeof(u32);
-	if (!cells_count)
-		return;
-
-	for (i = 0; i < (cells_count / 2); i++) {
-		if (fdt32_to_cpu(cells[2 * i + 1]) == IRQ_M_EXT)
-			cells[2 * i + 1] = cpu_to_fdt32(0xffffffff);
+		for (int i = 0; i < (cells_count / 2); i++) {
+			if (fdt32_to_cpu(cells[2 * i + 1]) == IRQ_M_EXT)
+				cells[2 * i + 1] = cpu_to_fdt32(0xffffffff);
+		}
 	}
 }
 

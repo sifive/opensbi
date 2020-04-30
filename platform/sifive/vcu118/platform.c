@@ -74,7 +74,7 @@ static void vcu118_modify_dt(void *fdt)
 	fdt_setprop_string(fdt, chosen_offset, "serial0",
 			   "/soc/serial@10010000:115200");
 
-	vcu118_plic_fdt_fixup(fdt, "riscv,plic0");
+	vcu118_plic_fdt_fixup(fdt, "sifive,plic-1.0.0");
 }
 
 static int vcu118_final_init(bool cold_boot)

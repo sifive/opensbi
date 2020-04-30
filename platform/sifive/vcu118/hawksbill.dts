@@ -714,13 +714,13 @@
 			reg = <0x0 0xc000000 0x0 0x4000000>;
 			riscv,ndev = <45>;
 			interrupt-controller;
-			interrupts-extended = <&cpu0_intc 0xffffffff
-                                               &cpu1_intc 0xffffffff &cpu1_intc 0x9
-                                               &cpu2_intc 0xffffffff &cpu2_intc 0x9
-                                               &cpu3_intc 0xffffffff &cpu3_intc 0x9
-                                               &cpu4_intc 0xffffffff &cpu4_intc 0x9>;
+			interrupts-extended = <&cpu0_intc 11
+                                               &cpu1_intc 11 &cpu1_intc 9
+                                               &cpu2_intc 11 &cpu2_intc 9
+                                               &cpu3_intc 11 &cpu3_intc 9
+                                               &cpu4_intc 11 &cpu4_intc 9>;
 			reg-names = "control";
-			riscv,max-priority = <0x7>;
+			riscv,max-priority = <7>;
 			numa-node-id = <0>;
 		};
 
@@ -730,11 +730,11 @@
 			reg = <0x1 0xc000000 0x0 0x4000000>;
 			riscv,ndev = <45>;
 			interrupt-controller;
-			interrupts-extended = <&cpu8_intc 0xffffffff
-                                               &cpu9_intc 0xffffffff &cpu9_intc 0x9
-                                               &cpu10_intc 0xffffffff &cpu10_intc 0x9
-                                               &cpu11_intc 0xffffffff &cpu11_intc 0x9
-                                               &cpu12_intc 0xffffffff &cpu12_intc 0x9>;
+			interrupts-extended = <&cpu8_intc 11
+                                               &cpu9_intc 11 &cpu9_intc 9
+                                               &cpu10_intc 11 &cpu10_intc 9
+                                               &cpu11_intc 11 &cpu11_intc 9
+                                               &cpu12_intc 11 &cpu12_intc 9>;
 			reg-names = "control";
 			riscv,max-priority = <0x7>;
 			numa-node-id = <1>;
@@ -746,11 +746,11 @@
 			reg = <0x2 0xc000000 0x0 0x4000000>;
 			riscv,ndev = <45>;
 			interrupt-controller;
-			interrupts-extended = <&cpu16_intc 0xffffffff
-                                               &cpu17_intc 0xffffffff &cpu17_intc 0x9
-                                               &cpu18_intc 0xffffffff &cpu18_intc 0x9
-                                               &cpu19_intc 0xffffffff &cpu19_intc 0x9
-                                               &cpu20_intc 0xffffffff &cpu20_intc 0x9>;
+			interrupts-extended = <&cpu16_intc 11
+                                               &cpu17_intc 11 &cpu17_intc 9
+                                               &cpu18_intc 11 &cpu18_intc 9
+                                               &cpu19_intc 11 &cpu19_intc 9
+                                               &cpu20_intc 11 &cpu20_intc 9>;
 			reg-names = "control";
 			riscv,max-priority = <0x7>;
 			numa-node-id = <2>;
@@ -762,11 +762,11 @@
 			reg = <0x3 0xc000000 0x0 0x4000000>;
 			riscv,ndev = <45>;
 			interrupt-controller;
-			interrupts-extended = <&cpu24_intc 0xffffffff
-                                               &cpu25_intc 0xffffffff &cpu25_intc 0x9
-                                               &cpu26_intc 0xffffffff &cpu26_intc 0x9
-                                               &cpu27_intc 0xffffffff &cpu27_intc 0x9
-                                               &cpu28_intc 0xffffffff &cpu28_intc 0x9>;
+			interrupts-extended = <&cpu24_intc 11
+                                               &cpu25_intc 11 &cpu25_intc 0x9
+                                               &cpu26_intc 11 &cpu26_intc 0x9
+                                               &cpu27_intc 11 &cpu27_intc 0x9
+                                               &cpu28_intc 11 &cpu28_intc 0x9>;
 			reg-names = "control";
 			riscv,max-priority = <0x7>;
 			numa-node-id = <3>;
