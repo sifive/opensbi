@@ -248,17 +248,8 @@ static void set_header(uint64_t base, uint8_t *header) {
 		SB(base + i, header[i]);
 }
 
-static void printc(char ch) {
-    int32_t r;
-    do {
-      __asm__ __volatile__ (
-        "amoor.w %0, %2, %1\n"
-        : "=r" (r), "+A" (*(uint32_t*)(UART_BASE))
-        : "r" (ch));
-    } while (r < 0);
-}
-
-static void printc2(char ch, uintptr_t x) {
+#ifdef DEBUG
+static void local_printc(char ch, uintptr_t x) {
     int32_t r;
     do {
       __asm__ __volatile__ (
@@ -267,6 +258,12 @@ static void printc2(char ch, uintptr_t x) {
         : "r" (ch));
     } while (r < 0);
 }
+#define DEBUGC(c)	local_printc(c, 0)
+#define DEBUGC2(c, x)	local_printc(c, x)
+#else
+#define DEBUGC(c)	do { } while (0)
+#define DEBUGC2(c, x)	do { } while (0)
+#endif
 
 // !!! This next bit is extremely unsafe. We are about to relocate DDR ... where we are running!
 // Fortunately, for our initial devwork, the chips have identical memory layout
@@ -338,8 +335,8 @@ void omnixtend(void)
 	uint8_t dip   = LB(AC_BASE+AC_DIPS);
 	int     id    = dip & 3;
 	int     nchan = (dip >> 2) & 3;
-	printc('0' + id);
-	printc('0' + nchan);
+	DEBUGC('0' + id);
+	DEBUGC('0' + nchan);
 	node_num = nchan+1;
 
 	/************************ Configure TLoE ethernet RX/TX **************************/
@@ -384,10 +381,10 @@ void omnixtend(void)
 
 	/************************ Configure TLoE remote regions **************************/
 
-	printc('d');
+	DEBUGC('d');
 	for (int chan = 0; chan < nchan; ++chan) {
 		int hid = his_id(chan, id);
-		printc('0' + hid);
+		DEBUGC('0' + hid);
 		uintptr_t c = ((uint64_t)hid) << 32;
 		uintptr_t m = ((uint64_t)hid) << 32;
 		uintptr_t mask = 0x7fffffffU;
@@ -402,11 +399,11 @@ void omnixtend(void)
 	uintptr_t m = ((uint64_t)id) << 32;
 
 	// Set our hartid base to 8*id (ie: if we were hartid=0, we are now 8).
-	printc('h');
+	DEBUGC('h');
 	SQ(AC_BASE+AC_HART_PREFIX, id * HAWKSBILL_MAX_HART_PER_NODE);
 
 	// This moves the MMIO space; after this line, local devices are re-positioned with offset c
-	printc('c');
+	DEBUGC('c');
 	asm volatile ("fence");
 	SQ(AC_BASE+AC_C_PREFIX, c);
 	asm volatile ("fence");
@@ -415,10 +412,10 @@ void omnixtend(void)
 	for (int chan = 0; chan < nchan; ++chan)
 		SW(c+TL_C_BASE+(TL_VCX*(1+chan))+TL_VC_ENABLE, 1);
 
-	printc('0' + id); // indicate access to board 0
+	DEBUGC('0' + id); // indicate access to board 0
 
 	// Move local memory; effectively like a DDR-wide DMA transfer
-	printc2('m', c);
+	DEBUGC2('m', c);
 	if (nchan > 0) {
 		flip_memory(
 			c+L2_BASE+L2_FLUSH64,
