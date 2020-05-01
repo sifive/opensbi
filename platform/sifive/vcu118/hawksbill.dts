@@ -889,6 +889,33 @@
 				disable-wp;
 			};
 		};
+
+		pci@20000000 {
+			#address-cells = <0x3>;
+			#interrupt-cells = <0x1>;
+			#size-cells = <0x2>;
+			compatible = "xlnx,xdma-host-3.00";
+			device_type = "pci";
+			interrupt-map = <0x0 0x0 0x0 0x1
+                                         &pci_intc2 0x1 0x0 0x0 0x0 0x2
+                                         &pci_intc2 0x2 0x0 0x0 0x0 0x3
+                                         &pci_intc2 0x3 0x0 0x0 0x0 0x4
+                                         &pci_intc2 0x4>;
+			interrupt-map-mask = <0x0 0x0 0x0 0x7>;
+			interrupt-names = "misc", "msi0", "msi1";
+			interrupt-parent = <&plic2>;
+			interrupts = <43 44 45>;
+			ranges = <0x2000000 0x0 0x40000000 0x0 0x40000000 0x0 0x40000000>;
+			reg = <0x0 0x20000000 0x0 0x4000000>;
+			reg-names = "control";
+			numa-node-id = <2>;
+
+			pci_intc2: interrupt-controller {
+				#address-cells = <0x0>;
+				#interrupt-cells = <0x1>;
+				interrupt-controller;
+			};
+		};
 	};
 
 	soc@300000000 {
@@ -964,6 +991,33 @@
 				spi-max-frequency = <5000000>;
 				voltage-ranges = <0xce4 0xce4>;
 				disable-wp;
+			};
+		};
+
+		pci@20000000 {
+			#address-cells = <0x3>;
+			#interrupt-cells = <0x1>;
+			#size-cells = <0x2>;
+			compatible = "xlnx,xdma-host-3.00";
+			device_type = "pci";
+			interrupt-map = <0x0 0x0 0x0 0x1
+                                         &pci_intc3 0x1 0x0 0x0 0x0 0x2
+                                         &pci_intc3 0x2 0x0 0x0 0x0 0x3
+                                         &pci_intc3 0x3 0x0 0x0 0x0 0x4
+                                         &pci_intc3 0x4>;
+			interrupt-map-mask = <0x0 0x0 0x0 0x7>;
+			interrupt-names = "misc", "msi0", "msi1";
+			interrupt-parent = <&plic3>;
+			interrupts = <43 44 45>;
+			ranges = <0x2000000 0x0 0x40000000 0x0 0x40000000 0x0 0x40000000>;
+			reg = <0x0 0x20000000 0x0 0x4000000>;
+			reg-names = "control";
+			numa-node-id = <3>;
+
+			pci_intc3: interrupt-controller {
+				#address-cells = <0x0>;
+				#interrupt-cells = <0x1>;
+				interrupt-controller;
 			};
 		};
 	};
