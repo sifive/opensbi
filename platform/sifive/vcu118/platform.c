@@ -314,8 +314,8 @@ static void __attribute__ ((noinline)) flip_memory(uintptr_t flush64, uintptr_t 
 		"j 	2f\n\t"
 
 		"_flush:\n\t"
-		"li	t0, 0x2000000000\n\t"
-		"li	t1, 0x2080000000\n\t"
+		"li	t0, 0x400000000000\n\t"
+		"li	t1, 0x400080000000\n\t"
 		"1:\n\t"
 		"sd	t0, (%0)\n\t"			// *flush64 = address
 		"addi	t0, t0, 64\n\t"
@@ -406,7 +406,7 @@ void omnixtend(void)
 		uintptr_t mask = 0x7fffffffU;
 		SQ(TL_C_BASE + (chan*TL_ROUTEX) + TL_ROUTE_BASE, c);
 		SQ(TL_C_BASE + (chan*TL_ROUTEX) + TL_ROUTE_MASK, mask);
-		SQ(TL_M_BASE + (chan*TL_ROUTEX) + TL_ROUTE_BASE, m + 0x2000000000UL);
+		SQ(TL_M_BASE + (chan*TL_ROUTEX) + TL_ROUTE_BASE, m + 0x400000000000UL);
 		SQ(TL_M_BASE + (chan*TL_ROUTEX) + TL_ROUTE_MASK, mask);
 	}
 

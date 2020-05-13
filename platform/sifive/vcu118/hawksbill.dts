@@ -3,7 +3,7 @@
 / {
 	#address-cells = <2>;
 	#size-cells = <2>;
-	compatible = "freechips,rocketchip-unknown-dev", "sifive,hifive-unleashed-a00", "sifive,fu540-c000";
+	compatible = "freechips,rocketchip-unknown-dev";
 	model = "freechips,rocketchip-unknown";
 
 	aliases {
@@ -84,7 +84,7 @@
 			};
 		};
 		cpu0: cpu@0 {
-			compatible = "sifive,e51", "sifive,rocket0", "riscv";
+			compatible = "sifive,e51", "sifive,bullet0", "riscv";
 			device_type = "cpu";
 			i-cache-block-size = <0x40>;
 			i-cache-sets = <0x80>;
@@ -102,7 +102,7 @@
 		};
 
 		cpu1: cpu@1 {
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -114,7 +114,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <0x1>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -130,7 +130,7 @@
 
 		cpu2: cpu@2 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -142,7 +142,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <0x2>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -158,7 +158,7 @@
 
 		cpu3: cpu@3 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -170,7 +170,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <0x3>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -186,7 +186,7 @@
 
 		cpu4: cpu@4 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -198,7 +198,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <0x4>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -214,7 +214,7 @@
 
 		cpu8: cpu@8 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,e51", "sifive,rocket0", "riscv";
+			compatible = "sifive,e51", "sifive,bullet0", "riscv";
 			device_type = "cpu";
 			i-cache-block-size = <0x40>;
 			i-cache-sets = <0x80>;
@@ -233,7 +233,7 @@
 
 		cpu9: cpu@9 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -245,7 +245,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <0x9>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -261,7 +261,7 @@
 
 		cpu10: cpu@10 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -273,7 +273,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <0xa>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -289,7 +289,7 @@
 
 		cpu11: cpu@11 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -301,7 +301,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <0xb>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -317,7 +317,7 @@
 
 		cpu12: cpu@12 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -329,7 +329,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <0xc>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -345,7 +345,7 @@
 
 		cpu16: cpu@16 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,e51", "sifive,rocket0", "riscv";
+			compatible = "sifive,e51", "sifive,bullet0", "riscv";
 			device_type = "cpu";
 			i-cache-block-size = <0x40>;
 			i-cache-sets = <0x80>;
@@ -364,7 +364,7 @@
 
 		cpu17: cpu@17 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -376,7 +376,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <17>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -392,7 +392,7 @@
 
 		cpu18: cpu@18 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -404,7 +404,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <18>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -420,7 +420,7 @@
 
 		cpu19: cpu@19 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -432,7 +432,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <19>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -448,7 +448,7 @@
 
 		cpu20: cpu@20 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -460,7 +460,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <20>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -476,7 +476,7 @@
 
 		cpu24: cpu@24 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,e51", "sifive,rocket0", "riscv";
+			compatible = "sifive,e51", "sifive,bullet0", "riscv";
 			device_type = "cpu";
 			i-cache-block-size = <0x40>;
 			i-cache-sets = <0x80>;
@@ -495,7 +495,7 @@
 
 		cpu25: cpu@25 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -507,7 +507,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <25>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -523,7 +523,7 @@
 
 		cpu26: cpu@26 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -535,7 +535,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <26>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -551,7 +551,7 @@
 
 		cpu27: cpu@27 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -563,7 +563,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <27>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -579,7 +579,7 @@
 
 		cpu28: cpu@28 {
 			clock-frequency = <0x0>;
-			compatible = "sifive,u54-mc", "sifive,rocket0", "riscv";
+			compatible = "sifive,u54-mc", "sifive,bullet0", "riscv";
 			d-cache-block-size = <0x40>;
 			d-cache-sets = <0x40>;
 			d-cache-size = <0x8000>;
@@ -591,7 +591,7 @@
 			i-cache-size = <0x8000>;
 			i-tlb-sets = <0x1>;
 			i-tlb-size = <0x20>;
-			mmu-type = "riscv,sv39";
+			mmu-type = "riscv,sv48";
 			reg = <28>;
 			riscv,isa = "rv64imafdc";
 			status = "okay";
@@ -609,7 +609,7 @@
 	soc@0 {
 		#address-cells = <0x2>;
 		#size-cells = <0x2>;
-		compatible = "sifive,fu540-c000", "sifive,fu540", "freechips,rocketchip-unknown-soc", "simple-bus";
+		compatible = "freechips,rocketchip-unknown-soc", "simple-bus";
 		ranges = <0x0 0x0 0x0 0x0 0x1 0x0>;
 
 		clint@2000000 {
@@ -713,7 +713,7 @@
 	soc@100000000 {
 		#address-cells = <0x2>;
 		#size-cells = <0x2>;
-		compatible = "sifive,fu540-c000", "sifive,fu540", "freechips,rocketchip-unknown-soc", "simple-bus";
+		compatible = "freechips,rocketchip-unknown-soc", "simple-bus";
 		ranges = <0x0 0x0 0x1 0x0 0x1 0x0>;
 
 		clint@2000000 {
@@ -817,7 +817,7 @@
 	soc@200000000 {
 		#address-cells = <0x2>;
 		#size-cells = <0x2>;
-		compatible = "sifive,fu540-c000", "sifive,fu540", "freechips,rocketchip-unknown-soc", "simple-bus";
+		compatible = "freechips,rocketchip-unknown-soc", "simple-bus";
 		ranges = <0x0 0x0 0x2 0x0 0x1 0x0>;
 
 		clint@2000000 {
@@ -921,7 +921,7 @@
 	soc@300000000 {
 		#address-cells = <0x2>;
 		#size-cells = <0x2>;
-		compatible = "sifive,fu540-c000", "sifive,fu540", "freechips,rocketchip-unknown-soc", "simple-bus";
+		compatible = "freechips,rocketchip-unknown-soc", "simple-bus";
 		ranges = <0x0 0x0 0x3 0x0 0x1 0x0>;
 
 		clint@2000000 {
@@ -1022,27 +1022,27 @@
 		};
 	};
 
-	mem0: memory@2000000000 {
+	mem0: memory@400000000000 {
 		device_type = "memory";
-		reg = <0x20 0x0 0x0 0x80000000>;
+		reg = <0x4000 0x0 0x0 0x80000000>;
 		numa-node-id = <0>;
 	};
 
-	mem1: memory@2100000000 {
+	mem1: memory@400100000000 {
 		device_type = "memory";
-		reg = <0x21 0x0 0x0 0x80000000>;
+		reg = <0x4001 0x0 0x0 0x80000000>;
 		numa-node-id = <1>;
 	};
 
-	mem2: memory@2200000000 {
+	mem2: memory@400200000000 {
 		device_type = "memory";
-		reg = <0x22 0x0 0x0 0x80000000>;
+		reg = <0x4002 0x0 0x0 0x80000000>;
 		numa-node-id = <2>;
 	};
 
-	mem3: memory@2300000000 {
+	mem3: memory@400300000000 {
 		device_type = "memory";
-		reg = <0x23 0x0 0x0 0x80000000>;
+		reg = <0x4003 0x0 0x0 0x80000000>;
 		numa-node-id = <3>;
 	};
 
