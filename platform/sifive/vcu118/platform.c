@@ -223,8 +223,10 @@ const struct sbi_platform platform = {
 #define PP_RX_BASE		0x100b0000UL
 #define PP_RX_HEADER_STRIP	0x00
 #define	PP_RX_HEADER_MASK	0x08
+#define PP_RX_ACCEPT_BROADCAST	0x10
 #define PP_RX_HEADER_DATA	0x40
 #define PP_VCX			0x80
+#define PP_ETHLITE		6
 
 #define ETHERNET_HEADER		14
 
@@ -388,12 +390,26 @@ void omnixtend(void)
 			// Match on sender+dest MAC and also the VC field in the TLoE header
 			SB(PP_RX_BASE + (PP_VCX*instance) + PP_RX_HEADER_DATA + ETHERNET_HEADER, vc << 5);
 			SQ(PP_RX_BASE + (PP_VCX*instance) + PP_RX_HEADER_MASK, (1 << (ETHERNET_HEADER+1)) - 1);
+			// Broadcasts would seriously muck up TLoE
+			SQ(PP_RX_BASE + (PP_VCX*instance) + PP_RX_ACCEPT_BROADCAST, 0);
 		}
 
 		// Mark packets with VC in TLoE header
 		SW(TL_C_BASE+(TL_VCX*(1+chan))+TL_VC_VC, 0);
 		SW(TL_M_BASE+(TL_VCX*(1+chan))+TL_VC_VC, 1);
 	}
+
+	// Configure ethlite MAC to receive all other frames to our MAC address
+	header[5] = id;
+	set_header(PP_RX_BASE + (PP_VCX*PP_ETHLITE) + PP_RX_HEADER_DATA, header);
+	SQ(PP_RX_BASE + (PP_VCX*PP_ETHLITE) + PP_RX_HEADER_STRIP, 0);    // leave header intact
+	SQ(PP_RX_BASE + (PP_VCX*PP_ETHLITE) + PP_RX_HEADER_MASK, 0x3f);  // match on 6 bytes (dest MAC)
+	SQ(PP_RX_BASE + (PP_VCX*PP_ETHLITE) + PP_RX_ACCEPT_BROADCAST, 1);
+
+	// Do not inject header data
+	memset(&header[0], 0, ETHERNET_HEADER);
+	set_header(PP_TX_BASE + (PP_VCX*PP_ETHLITE) + PP_TX_HEADER_DATA, header);
+	SQ(PP_TX_BASE + (PP_VCX*PP_ETHLITE) + PP_TX_HEADER_INSERT, 0);   // do not inject a header
 
 	/************************ Configure TLoE remote regions **************************/
 
