@@ -24,13 +24,13 @@
 
 #define VCU118_TLCLK				100000000
 
-#define VCU118_CLINT_ADDR			0x2000000
+#define VCU118_CLINT_ADDR			0x200002000000L
 
-#define VCU118_PLIC_ADDR			0xc000000
+#define VCU118_PLIC_ADDR			0x20000c000000L
 #define VCU118_PLIC_NUM_SOURCES			45
 #define VCU118_PLIC_NUM_PRIORITIES		7
 
-#define VCU118_UART0_ADDR			0x10010000
+#define VCU118_UART0_ADDR			0x200010010000L
 #define VCU118_UART_BAUDRATE			115200
 
 /**
@@ -217,10 +217,10 @@ const struct sbi_platform platform = {
 };
 
 /* Packet routing control (in bytes) */
-#define PP_TX_BASE		0x100a0000UL
+#define PP_TX_BASE		0x2000100a0000UL
 #define PP_TX_HEADER_INSERT	0x00
 #define PP_TX_HEADER_DATA	0x40
-#define PP_RX_BASE		0x100b0000UL
+#define PP_RX_BASE		0x2000100b0000UL
 #define PP_RX_HEADER_STRIP	0x00
 #define	PP_RX_HEADER_MASK	0x08
 #define PP_RX_ACCEPT_BROADCAST	0x10
@@ -231,15 +231,15 @@ const struct sbi_platform platform = {
 #define ETHERNET_HEADER		14
 
 /* Addressing control (in bytes) */
-#define AC_BASE			0x10070000UL
+#define AC_BASE			0x200010070000UL
 #define AC_DIPS			0
 #define AC_HART_PREFIX		8
 #define AC_C_PREFIX		16
 #define AC_M_PREFIX		24
 
 /* TLoE control (in bytes) */
-#define TL_C_BASE	0x10080000UL // cbus
-#define TL_M_BASE	0x10090000UL // mbus
+#define TL_C_BASE	0x200010080000UL // cbus
+#define TL_M_BASE	0x200010090000UL // mbus
 #define TL_ROUTEX	0x10
 #define TL_ROUTE_BASE	0
 #define TL_ROUTE_MASK	8
@@ -249,11 +249,11 @@ const struct sbi_platform platform = {
 #define TL_VC_FLIT	8
 
 /* L2 control (in bytes) */
-#define L2_BASE			0x2010000UL
+#define L2_BASE			0x200002010000UL
 #define L2_FLUSH64		0x200
 
 /* UART (in bytes) */
-#define UART_BASE		0x10010000UL
+#define UART_BASE		0x200010010000UL
 
 /* Hacky register pokers */
 #define SQ(x, v)	(*(volatile uint64_t*)(x)) = (v)
@@ -420,7 +420,7 @@ void omnixtend(void)
 		uintptr_t c = ((uint64_t)hid) << 32;
 		uintptr_t m = ((uint64_t)hid) << 32;
 		uintptr_t mask = 0x7fffffffU;
-		SQ(TL_C_BASE + (chan*TL_ROUTEX) + TL_ROUTE_BASE, c);
+		SQ(TL_C_BASE + (chan*TL_ROUTEX) + TL_ROUTE_BASE, c + 0x200000000000UL);
 		SQ(TL_C_BASE + (chan*TL_ROUTEX) + TL_ROUTE_MASK, mask);
 		SQ(TL_M_BASE + (chan*TL_ROUTEX) + TL_ROUTE_BASE, m + 0x400000000000UL);
 		SQ(TL_M_BASE + (chan*TL_ROUTEX) + TL_ROUTE_MASK, mask);

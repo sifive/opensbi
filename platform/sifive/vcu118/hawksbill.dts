@@ -14,7 +14,7 @@
 	};
 
 	chosen {
-		bootargs = "earlycon=sifive,0x10010000 console=ttySIF0,115200";
+		bootargs = "earlycon=sifive,0x200010010000 console=ttySIF0,115200";
 	};
 
 	cpus {
@@ -610,25 +610,25 @@
 		#address-cells = <0x2>;
 		#size-cells = <0x2>;
 		compatible = "freechips,rocketchip-unknown-soc", "simple-bus";
-		ranges = <0x0 0x0 0x0 0x0 0x1 0x0>;
+		ranges = <0x2000 0x0 0x2000 0x0 0x1 0x0>;
 
-		clint@2000000 {
+		clint@200002000000 {
 			compatible = "riscv,clint0";
 			interrupts-extended = <&cpu0_intc 0x3 &cpu0_intc 0x7
                                                &cpu1_intc 0x3 &cpu1_intc 0x7
                                                &cpu2_intc 0x3 &cpu2_intc 0x7
                                                &cpu3_intc 0x3 &cpu3_intc 0x7
                                                &cpu4_intc 0x3 &cpu4_intc 0x7>;
-			reg = <0x0 0x2000000 0x0 0x10000>;
+			reg = <0x2000 0x2000000 0x0 0x10000>;
 			reg-names = "control";
 			numa-node-id = <0>;
 		};
 
-		plic0: interrupt-controller@c000000 {
+		plic0: interrupt-controller@20000c000000 {
 			#interrupt-cells = <0x1>;
 			compatible = "sifive,plic-1.0.0";
-			reg = <0x0 0xc000000 0x0 0x4000000>;
-			riscv,ndev = <45>;
+			reg = <0x2000 0xc000000 0x0 0x4000000>;
+			riscv,ndev = <52>;
 			interrupt-controller;
 			interrupts-extended = <&cpu0_intc 11
                                                &cpu1_intc 11 &cpu1_intc 9
@@ -640,9 +640,9 @@
 			numa-node-id = <0>;
 		};
 
-		uart0: serial@10010000 {
+		uart0: serial@200010010000 {
 			compatible = "sifive,fu540-c000-uart", "sifive,uart0";
-			reg = <0x0 0x10010000 0x0 0x1000>;
+			reg = <0x2000 0x10010000 0x0 0x1000>;
 			interrupt-parent = <&plic0>;
 			clocks = <&tlclk0>;
 			status = "okay";
@@ -650,7 +650,7 @@
 			numa-node-id = <0>;
 		};
 
-		gpio@10060000 {
+		gpio@200010060000 {
 			#gpio-cells = <0x2>;
 			#interrupt-cells = <0x2>;
 			compatible = "sifive,gpio0", "sifive,gpio1";
@@ -658,14 +658,14 @@
 			interrupt-controller;
 			interrupt-parent = <&plic0>;
 			interrupts = <6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21>;
-			reg = <0x0 0x10060000 0x0 0x1000>;
+			reg = <0x2000 0x10060000 0x0 0x1000>;
 			reg-names = "control";
 			numa-node-id = <0>;
 		};
 
-		spi@10050000 {
+		spi@200010050000 {
 			compatible = "sifive,fu540-c000-spi", "sifive,spi0";
-			reg = <0x0 0x10050000 0x0 0x1000>;
+			reg = <0x2000 0x10050000 0x0 0x1000>;
 			interrupt-parent = <&plic0>;
 			interrupts = <26>;
 			clocks = <&tlclk0>;
@@ -682,19 +682,19 @@
 			};
 		};
 
-		ethlite@100c0000 {
+		ethlite@2000100c0000 {
 			compatible = "xlnx,xps-ethernetlite-3.00.a";
 			device_type = "network";
 			interrupt-parent = <&plic0>;
 			interrupts = <27>;
-			reg = <0x0 0x100c0000 0x0 0x2000>;
+			reg = <0x2000 0x100c0000 0x0 0x2000>;
 			xlnx,rx-ping-pong = <1>;
 			xlnx,tx-ping-pong = <1>;
 			local-mac-address = [ 68 05 CA 88 63 00 ];
 			numa-node-id = <0>;
 		};
 
-		pci@20000000 {
+		pci@200020000000 {
 			#address-cells = <0x3>;
 			#interrupt-cells = <0x1>;
 			#size-cells = <0x2>;
@@ -708,9 +708,9 @@
 			interrupt-map-mask = <0x0 0x0 0x0 0x7>;
 			interrupt-names = "misc", "msi0", "msi1";
 			interrupt-parent = <&plic0>;
-			interrupts = <44 45 46>;
-			ranges = <0x2000000 0x0 0x40000000 0x0 0x40000000 0x0 0x40000000>;
-			reg = <0x0 0x20000000 0x0 0x4000000>;
+			interrupts = <45 46 47>;
+			ranges = <0x2000000 0x0 0x0 0x2000 0x40000000 0x0 0x40000000>;
+			reg = <0x2000 0x20000000 0x0 0x4000000>;
 			reg-names = "control";
 			numa-node-id = <0>;
 
@@ -726,25 +726,25 @@
 		#address-cells = <0x2>;
 		#size-cells = <0x2>;
 		compatible = "freechips,rocketchip-unknown-soc", "simple-bus";
-		ranges = <0x0 0x0 0x1 0x0 0x1 0x0>;
+		ranges = <0x2000 0x0 0x2001 0x0 0x1 0x0>;
 
-		clint@2000000 {
+		clint@200002000000 {
 			compatible = "riscv,clint0";
 			interrupts-extended = <&cpu8_intc  0x3 &cpu8_intc  0x7
                                                &cpu9_intc  0x3 &cpu9_intc  0x7
                                                &cpu10_intc 0x3 &cpu10_intc 0x7
                                                &cpu11_intc 0x3 &cpu11_intc 0x7
                                                &cpu12_intc 0x3 &cpu12_intc 0x7>;
-			reg = <0x0 0x2000000 0x0 0x10000>;
+			reg = <0x2000 0x2000000 0x0 0x10000>;
 			reg-names = "control";
 			numa-node-id = <1>;
 		};
 
-		plic1: interrupt-controller@c000000 {
+		plic1: interrupt-controller@20000c000000 {
 			#interrupt-cells = <0x1>;
 			compatible = "sifive,plic-1.0.0";
-			reg = <0x0 0xc000000 0x0 0x4000000>;
-			riscv,ndev = <45>;
+			reg = <0x2000 0xc000000 0x0 0x4000000>;
+			riscv,ndev = <52>;
 			interrupt-controller;
 			interrupts-extended = <&cpu8_intc 11
                                                &cpu9_intc 11 &cpu9_intc 9
@@ -756,9 +756,9 @@
 			numa-node-id = <1>;
 		};
 
-		uart1: serial@10010000 {
+		uart1: serial@200010010000 {
 			compatible = "sifive,fu540-c000-uart", "sifive,uart0";
-			reg = <0x0 0x10010000 0x0 0x1000>;
+			reg = <0x2000 0x10010000 0x0 0x1000>;
 			interrupt-parent = <&plic1>;
 			clocks = <&tlclk0>;
 			status = "okay";
@@ -766,7 +766,7 @@
 			numa-node-id = <1>;
 		};
 
-		gpio@10060000 {
+		gpio@200010060000 {
 			#gpio-cells = <0x2>;
 			#interrupt-cells = <0x2>;
 			compatible = "sifive,gpio0", "sifive,gpio1";
@@ -774,14 +774,14 @@
 			interrupt-controller;
 			interrupt-parent = <&plic1>;
 			interrupts = <6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21>;
-			reg = <0x0 0x10060000 0x0 0x1000>;
+			reg = <0x2000 0x10060000 0x0 0x1000>;
 			reg-names = "control";
 			numa-node-id = <1>;
 		};
 
-		spi@10050000 {
+		spi@200010050000 {
 			compatible = "sifive,fu540-c000-spi", "sifive,spi0";
-			reg = <0x0 0x10050000 0x0 0x1000>;
+			reg = <0x2000 0x10050000 0x0 0x1000>;
 			interrupt-parent = <&plic1>;
 			interrupts = <26>;
 			clocks = <&tlclk0>;
@@ -798,19 +798,19 @@
 			};
 		};
 
-		ethlite@100c0000 {
+		ethlite@2000100c0000 {
 			compatible = "xlnx,xps-ethernetlite-3.00.a";
 			device_type = "network";
 			interrupt-parent = <&plic1>;
 			interrupts = <27>;
-			reg = <0x0 0x100c0000 0x0 0x2000>;
+			reg = <0x2000 0x100c0000 0x0 0x2000>;
 			xlnx,rx-ping-pong = <1>;
 			xlnx,tx-ping-pong = <1>;
 			local-mac-address = [ 68 05 CA 88 63 01 ];
 			numa-node-id = <1>;
 		};
 
-		pci@20000000 {
+		pci@200020000000 {
 			#address-cells = <0x3>;
 			#interrupt-cells = <0x1>;
 			#size-cells = <0x2>;
@@ -824,9 +824,9 @@
 			interrupt-map-mask = <0x0 0x0 0x0 0x7>;
 			interrupt-names = "misc", "msi0", "msi1";
 			interrupt-parent = <&plic1>;
-			interrupts = <44 45 46>;
-			ranges = <0x2000000 0x0 0x40000000 0x0 0x40000000 0x0 0x40000000>;
-			reg = <0x0 0x20000000 0x0 0x4000000>;
+			interrupts = <45 46 47>;
+			ranges = <0x2000000 0x0 0x0 0x2000 0x40000000 0x0 0x40000000>;
+			reg = <0x2000 0x20000000 0x0 0x4000000>;
 			reg-names = "control";
 			numa-node-id = <1>;
 
@@ -842,25 +842,25 @@
 		#address-cells = <0x2>;
 		#size-cells = <0x2>;
 		compatible = "freechips,rocketchip-unknown-soc", "simple-bus";
-		ranges = <0x0 0x0 0x2 0x0 0x1 0x0>;
+		ranges = <0x2000 0x0 0x2002 0x0 0x1 0x0>;
 
-		clint@2000000 {
+		clint@200002000000 {
 			compatible = "riscv,clint0";
 			interrupts-extended = <&cpu16_intc 0x3 &cpu16_intc 0x7
                                                &cpu17_intc 0x3 &cpu17_intc 0x7
                                                &cpu18_intc 0x3 &cpu18_intc 0x7
                                                &cpu19_intc 0x3 &cpu19_intc 0x7
                                                &cpu20_intc 0x3 &cpu20_intc 0x7>;
-			reg = <0x0 0x2000000 0x0 0x10000>;
+			reg = <0x2000 0x2000000 0x0 0x10000>;
 			reg-names = "control";
 			numa-node-id = <2>;
 		};
 
-		plic2: interrupt-controller@c000000 {
+		plic2: interrupt-controller@20000c000000 {
 			#interrupt-cells = <0x1>;
 			compatible = "sifive,plic-1.0.0";
-			reg = <0x0 0xc000000 0x0 0x4000000>;
-			riscv,ndev = <45>;
+			reg = <0x2000 0xc000000 0x0 0x4000000>;
+			riscv,ndev = <52>;
 			interrupt-controller;
 			interrupts-extended = <&cpu16_intc 11
                                                &cpu17_intc 11 &cpu17_intc 9
@@ -872,9 +872,9 @@
 			numa-node-id = <2>;
 		};
 
-		uart2: serial@10010000 {
+		uart2: serial@200010010000 {
 			compatible = "sifive,fu540-c000-uart", "sifive,uart0";
-			reg = <0x0 0x10010000 0x0 0x1000>;
+			reg = <0x2000 0x10010000 0x0 0x1000>;
 			interrupt-parent = <&plic2>;
 			clocks = <&tlclk0>;
 			status = "okay";
@@ -882,7 +882,7 @@
 			numa-node-id = <2>;
 		};
 
-		gpio@10060000 {
+		gpio@200010060000 {
 			#gpio-cells = <0x2>;
 			#interrupt-cells = <0x2>;
 			compatible = "sifive,gpio0", "sifive,gpio1";
@@ -890,14 +890,14 @@
 			interrupt-controller;
 			interrupt-parent = <&plic2>;
 			interrupts = <6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21>;
-			reg = <0x0 0x10060000 0x0 0x1000>;
+			reg = <0x2000 0x10060000 0x0 0x1000>;
 			reg-names = "control";
 			numa-node-id = <2>;
 		};
 
-		spi@10050000 {
+		spi@200010050000 {
 			compatible = "sifive,fu540-c000-spi", "sifive,spi0";
-			reg = <0x0 0x10050000 0x0 0x1000>;
+			reg = <0x2000 0x10050000 0x0 0x1000>;
 			interrupt-parent = <&plic2>;
 			interrupts = <26>;
 			clocks = <&tlclk0>;
@@ -914,19 +914,19 @@
 			};
 		};
 
-		ethlite@100c0000 {
+		ethlite@2000100c0000 {
 			compatible = "xlnx,xps-ethernetlite-3.00.a";
 			device_type = "network";
 			interrupt-parent = <&plic2>;
 			interrupts = <27>;
-			reg = <0x0 0x100c0000 0x0 0x2000>;
+			reg = <0x2000 0x100c0000 0x0 0x2000>;
 			xlnx,rx-ping-pong = <1>;
 			xlnx,tx-ping-pong = <1>;
 			local-mac-address = [ 68 05 CA 88 63 02 ];
 			numa-node-id = <2>;
 		};
 
-		pci@20000000 {
+		pci@200020000000 {
 			#address-cells = <0x3>;
 			#interrupt-cells = <0x1>;
 			#size-cells = <0x2>;
@@ -940,9 +940,9 @@
 			interrupt-map-mask = <0x0 0x0 0x0 0x7>;
 			interrupt-names = "misc", "msi0", "msi1";
 			interrupt-parent = <&plic2>;
-			interrupts = <44 45 46>;
-			ranges = <0x2000000 0x0 0x40000000 0x0 0x40000000 0x0 0x40000000>;
-			reg = <0x0 0x20000000 0x0 0x4000000>;
+			interrupts = <45 46 47>;
+			ranges = <0x2000000 0x0 0x0 0x2000 0x40000000 0x0 0x40000000>;
+			reg = <0x2000 0x20000000 0x0 0x4000000>;
 			reg-names = "control";
 			numa-node-id = <2>;
 
@@ -958,25 +958,25 @@
 		#address-cells = <0x2>;
 		#size-cells = <0x2>;
 		compatible = "freechips,rocketchip-unknown-soc", "simple-bus";
-		ranges = <0x0 0x0 0x3 0x0 0x1 0x0>;
+		ranges = <0x2000 0x0 0x2003 0x0 0x1 0x0>;
 
-		clint@2000000 {
+		clint@200002000000 {
 			compatible = "riscv,clint0";
 			interrupts-extended = <&cpu24_intc 0x3 &cpu24_intc 0x7
                                                &cpu25_intc 0x3 &cpu25_intc 0x7
                                                &cpu26_intc 0x3 &cpu26_intc 0x7
                                                &cpu27_intc 0x3 &cpu27_intc 0x7
                                                &cpu28_intc 0x3 &cpu28_intc 0x7>;
-			reg = <0x0 0x2000000 0x0 0x10000>;
+			reg = <0x2000 0x2000000 0x0 0x10000>;
 			reg-names = "control";
 			numa-node-id = <3>;
 		};
 
-		plic3: interrupt-controller@c000000 {
+		plic3: interrupt-controller@20000c000000 {
 			#interrupt-cells = <0x1>;
 			compatible = "sifive,plic-1.0.0";
-			reg = <0x0 0xc000000 0x0 0x4000000>;
-			riscv,ndev = <45>;
+			reg = <0x2000 0xc000000 0x0 0x4000000>;
+			riscv,ndev = <52>;
 			interrupt-controller;
 			interrupts-extended = <&cpu24_intc 11
                                                &cpu25_intc 11 &cpu25_intc 0x9
@@ -988,9 +988,9 @@
 			numa-node-id = <3>;
 		};
 
-		uart3: serial@10010000 {
+		uart3: serial@200010010000 {
 			compatible = "sifive,fu540-c000-uart", "sifive,uart0";
-			reg = <0x0 0x10010000 0x0 0x1000>;
+			reg = <0x2000 0x10010000 0x0 0x1000>;
 			interrupt-parent = <&plic3>;
 			clocks = <&tlclk0>;
 			status = "okay";
@@ -998,7 +998,7 @@
 			numa-node-id = <3>;
 		};
 
-		gpio@10060000 {
+		gpio@200010060000 {
 			#gpio-cells = <0x2>;
 			#interrupt-cells = <0x2>;
 			compatible = "sifive,gpio0", "sifive,gpio1";
@@ -1006,14 +1006,14 @@
 			interrupt-controller;
 			interrupt-parent = <&plic3>;
 			interrupts = <6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21>;
-			reg = <0x0 0x10060000 0x0 0x1000>;
+			reg = <0x2000 0x10060000 0x0 0x1000>;
 			reg-names = "control";
 			numa-node-id = <3>;
 		};
 
-		spi@10050000 {
+		spi@200010050000 {
 			compatible = "sifive,fu540-c000-spi", "sifive,spi0";
-			reg = <0x0 0x10050000 0x0 0x1000>;
+			reg = <0x2000 0x10050000 0x0 0x1000>;
 			interrupt-parent = <&plic3>;
 			interrupts = <26>;
 			clocks = <&tlclk0>;
@@ -1030,19 +1030,19 @@
 			};
 		};
 
-		ethlite@100c0000 {
+		ethlite@2000100c0000 {
 			compatible = "xlnx,xps-ethernetlite-3.00.a";
 			device_type = "network";
 			interrupt-parent = <&plic3>;
 			interrupts = <27>;
-			reg = <0x0 0x100c0000 0x0 0x2000>;
+			reg = <0x2000 0x100c0000 0x0 0x2000>;
 			xlnx,rx-ping-pong = <1>;
 			xlnx,tx-ping-pong = <1>;
 			local-mac-address = [ 68 05 CA 88 63 03 ];
 			numa-node-id = <3>;
 		};
 
-		pci@20000000 {
+		pci@200020000000 {
 			#address-cells = <0x3>;
 			#interrupt-cells = <0x1>;
 			#size-cells = <0x2>;
@@ -1056,9 +1056,9 @@
 			interrupt-map-mask = <0x0 0x0 0x0 0x7>;
 			interrupt-names = "misc", "msi0", "msi1";
 			interrupt-parent = <&plic3>;
-			interrupts = <44 45 46>;
-			ranges = <0x2000000 0x0 0x40000000 0x0 0x40000000 0x0 0x40000000>;
-			reg = <0x0 0x20000000 0x0 0x4000000>;
+			interrupts = <45 46 47>;
+			ranges = <0x2000000 0x0 0x0 0x2000 0x40000000 0x0 0x40000000>;
+			reg = <0x2000 0x20000000 0x0 0x4000000>;
 			reg-names = "control";
 			numa-node-id = <3>;
 
